@@ -7,6 +7,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.HashMap;
 import java.util.HashSet;
 
 /**
@@ -52,6 +53,12 @@ public class ChatServer {
      * The appplication main method, which just listens on a port and
      * spawns handler threads.
      */
+
+    private static HashSet<String> selectedClientNames = new HashSet<>();
+
+    //created a hashmap
+    private static HashMap<String, PrintWriter> clientNameWithPrintWriter = new HashMap<>();
+
     public static void main(String[] args) throws Exception {
         System.out.println("The chat server is running.");
         ServerSocket listener = new ServerSocket(PORT);
