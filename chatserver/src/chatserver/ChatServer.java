@@ -136,7 +136,8 @@ public class ChatServer {
                 
                 // TODO: You may have to add some code here to broadcast all clients the new
                 // client's name for the task 9 on the lab sheet. 
-
+                
+                clientNameWithPrintWriter.put(name, out);
                 
                 // Accept messages from this client and broadcast them.
                 // Ignore other clients that cannot be broadcasted to.
