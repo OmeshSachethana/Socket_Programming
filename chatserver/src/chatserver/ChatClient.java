@@ -8,8 +8,12 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.HashSet;
 
+import javax.swing.DefaultListModel;
+import javax.swing.JCheckBox;
 import javax.swing.JFrame;
+import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -39,6 +43,18 @@ public class ChatClient {
     JTextField textField = new JTextField(40);
     JTextArea messageArea = new JTextArea(8, 40);
     // TODO: Add a list box
+
+    JCheckBox checkBox = new JCheckBox("Broadcast");
+    
+    // Add list to show client list 
+	JList userlist = new JList();
+
+    // To store clients
+	HashSet<String> selectedClient = new HashSet<String>();
+	DefaultListModel listModel;
+	
+	// To handle checkbox
+	static boolean checkBoxcheck = true;
 
     /**
      * Constructs the client by laying out the GUI and registering a
