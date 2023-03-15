@@ -43,7 +43,7 @@ public class ChatClient {
 	JTextArea messageArea = new JTextArea(8, 40);
 
 	// TODO: Add a list box
-	/* Add checkbox for Broadcast feature */
+	//Added checkbox for Broadcast feature
 	JCheckBox checkBox = new JCheckBox("Broadcast");
 	
 	/* Add list to show client list */
