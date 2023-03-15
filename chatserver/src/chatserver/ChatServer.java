@@ -120,11 +120,12 @@ public class ChatServer {
                     
                     // TODO: Add code to ensure the thread safety of the
                     // the shared variable 'names'
-                    if (!names.contains(name)) {
-                            names.add(name);
-                            break;
-                        }
-                    
+                    synchronized (names) {
+                        if (!names.contains(name)) {
+                                names.add(name);
+                                break;
+                            }
+                    }
                  }
 
                 // Now that a successful name has been chosen, add the
