@@ -18,6 +18,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.ListModel;
 
 /**
  * A simple Swing-based client for the chat server.  Graphically
@@ -83,10 +84,52 @@ public class ChatClient {
              * the text area in preparation for the next message.
              */
             public void actionPerformed(ActionEvent e) {
-                out.println(textField.getText());
-                textField.setText("");
-            }
-        });
+				
+				/* check whether is there any selected client in the list.
+				 * then store in 'selectedClient'.
+				 * then read hashset and send selected client list to server. */
+				if (checkBoxcheck || userlist.isSelectionEmpty()) {
+					out.println("CHECK" + textField.getText());
+					textField.setText("");
+
+				} else {
+					ListModel listModel = userlist.getModel();
+					
+					for (int count : userlist.getSelectedIndices()) {
+						selectedClient.add(listModel.getElementAt(count).toString());
+					}
+										
+					for (String selectedList : selectedClient) {
+						out.println(selectedList);
+					}
+
+					/* If it there selected client with massage, send them to server with message. */
+					out.println("SELECTEDMESSAGE" + textField.getText());
+					
+					/* clear the text field. */
+					textField.setText("");
+					
+					/* unSelect the client list*/
+					userlist.clearSelection();
+					selectedClient.clear();
+				}
+			}
+		});
+
+		/* Adding new listener to handle checkBox */
+		checkBox.addActionListener(new ActionListener() {
+			
+			/* if the checkBox select then set the value of checkBoxcheck variable to TRUE */			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+
+				if (checkBox.isSelected()) {
+					checkBoxcheck = true;
+				} else {
+					checkBoxcheck = false;
+				}
+			}
+		});
         
         
     }
@@ -119,25 +162,46 @@ public class ChatClient {
     private void run() throws IOException {
 
         // Make connection and initialize streams
-        String serverAddress = getServerAddress();
-        Socket socket = new Socket(serverAddress, 9001);
-        in = new BufferedReader(new InputStreamReader(
-            socket.getInputStream()));
-        out = new PrintWriter(socket.getOutputStream(), true);
+		String serverAddress = getServerAddress();
+		Socket socket = new Socket(serverAddress, 9001);
+		in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+		out = new PrintWriter(socket.getOutputStream(), true);
 
-        // Process all messages from server, according to the protocol.
-        
-        // TODO: You may have to extend this protocol to achieve task 9 in the lab sheet
-        while (true) {
-            String line = in.readLine();
-            if (line.startsWith("SUBMITNAME")) {
-                out.println(getName());
-            } else if (line.startsWith("NAMEACCEPTED")) {
-                textField.setEditable(true);
-            } else if (line.startsWith("MESSAGE")) {
-                messageArea.append(line.substring(8) + "\n");
-            }
-        }
+		// Process all messages from server, according to the protocol.
+		// TODO: You may have to extend this protocol to achieve task 9 in the lab sheet
+		listModel = new DefaultListModel();
+		
+		while (true) {
+			
+			String line = in.readLine();			
+			if (line.startsWith("SUBMITNAME")) {				
+				out.println(getName());
+			} else if (line.startsWith("NAMEACCEPTED")) {
+				textField.setEditable(true);
+				
+				
+			/* Getting new client from the server and store them in listModel(DefalutListModel).
+			 * then add them to listView */
+			} else if (line.startsWith("NAME")) {
+				listModel.addElement(line.substring(4));
+				userlist.setModel(listModel);
+
+			/* Getting all client from the server and store them in listModel(DefalutListModel).
+			 * then add them to listView */
+			} else if (line.startsWith("CLIENTNAME")) {
+				listModel.addElement(line.substring(10));
+				userlist.setModel(listModel);
+
+			/* If client remove from the server then remove client from listModel(DefalutListModel).
+			 * then update the listView */
+			} else if (line.startsWith("REMOVECLIENT")) {
+				listModel.addElement(listModel.indexOf(line.substring(12)));
+				userlist.setModel(listModel);
+				
+			} else if (line.startsWith("MESSAGE")) {
+				messageArea.append(line.substring(8) + "\n");
+			}
+		}
     }
 
     /**
