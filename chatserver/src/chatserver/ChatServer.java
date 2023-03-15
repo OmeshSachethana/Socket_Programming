@@ -137,24 +137,60 @@ public class ChatServer {
                 // TODO: You may have to add some code here to broadcast all clients the new
                 // client's name for the task 9 on the lab sheet. 
                 
+                //add client details to hashmap
                 clientNameWithPrintWriter.put(name, out);
                 
+
+                for (String key : clientNameWithPrintWriter.keySet()) {
+
+					if (key.equals(name)) {
+						for (String name : names) {
+							clientNameWithPrintWriter.get(key).println("CLIENTNAME" + name);
+						}
+					} else {
+						clientNameWithPrintWriter.get(key).println("NAME" + name);
+					}
+				}
+
                 // Accept messages from this client and broadcast them.
                 // Ignore other clients that cannot be broadcasted to.
                 while (true) {
-                    String input = in.readLine();
-                    if (input == null) {
-                        return;
-                    }
-                    
-                    // TODO: Add code to send a message to a specific client and not
-                    // all clients. You may have to use a HashMap to store the sockets along 
-                    // with the chat client names
-                    for (PrintWriter writer : writers) {
-                        writer.println("MESSAGE " + name + ": " + input);
-                    }
-                }
+
+					String input = in.readLine();
+					
+					/* Check if there any message with 'SELECTEDMESSAGE'.
+					 * Then send message to selected client. */
+					if (input.startsWith("SELECTEDMESSAGE")) {
+						if (input == null) {
+							return;
+						}
+
+						for (String count : selectedClientNames) {
+							for (String key : clientNameWithPrintWriter.keySet()) {
+								if (count.equals(key)) {
+									clientNameWithPrintWriter.get(key).println("MESSAGE " + name + ": " + input.substring(15));
+								}
+							}
+						}
+
+						/* clear selectedtClientNames for accept new. */
+						selectedClientNames.clear();
+
+					/* If get message with 'CHECK'. Then send message to all clients */
+					} else if (input.startsWith("CHECK")) {
+
+						for (PrintWriter writer : writers) {
+							writer.println("MESSAGE " + name + ": " + input.substring(5));
+						}
+					} else {
+						selectedClientNames.add(input);
+					}
+				}
             }// TODO: Handle the SocketException here to handle a client closing the socket
+            catch (java.net.SocketException e) {
+				System.out.println("client left.");
+
+			}
             catch (IOException e) {
                 System.out.println(e);
             } finally {
